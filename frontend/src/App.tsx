@@ -9,12 +9,6 @@ interface QuizData {
   explanation: string;
 }
 
-interface IdiomData {
-  idiom: string;
-  quiz: QuizData;
-  imageUrl: string;
-}
-
 function App() {
   const [idiom, setIdiom] = useState<string>('');
   const [illustrationUrl, setIllustrationUrl] = useState<string>('');
