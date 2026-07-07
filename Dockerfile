@@ -1,42 +1,52 @@
 # --- Stage 1: Build Frontend ---
 FROM node:24-alpine AS frontend-builder
-WORKDIR /app/frontend
+WORKDIR /app
 
-COPY frontend/package*.json ./
-RUN npm ci
+# Copy workspace root manifests + lockfile + workspace package.json files
+COPY package*.json ./
+COPY frontend/package.json ./frontend/
+COPY backend/package.json ./backend/
 
-COPY frontend/ ./
-# Inject production API base URL env var (if needed, but relative requests work out of the box!)
+RUN npm ci -w frontend
+
+COPY frontend/ ./frontend/
 ENV VITE_API_URL=""
-RUN npm run build
+RUN npm run build -w frontend
 
 # --- Stage 2: Build Backend ---
 FROM node:24-alpine AS backend-builder
-WORKDIR /app/backend
+WORKDIR /app
 
-COPY backend/package*.json ./
-RUN npm ci
+COPY package*.json ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
 
-COPY backend/ ./
-RUN npm run build
+RUN npm ci -w backend
+
+COPY backend/ ./backend/
+RUN npm run build -w backend
 
 # --- Stage 3: Production Runner ---
 FROM node:24-alpine AS runner
-WORKDIR /app/backend
+WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Copy backend built files and dependencies
-COPY --from=backend-builder /app/backend/dist ./dist
-COPY --from=backend-builder /app/backend/package*.json ./
+# Install only backend production dependencies
+COPY package*.json ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
 
-# Install only production dependencies
-RUN npm ci --only=production
+RUN npm ci -w backend --omit=dev
 
-# Copy frontend built static files to matching relative path
-COPY --from=frontend-builder /app/frontend/dist /app/frontend/dist
+# Copy backend built files
+COPY --from=backend-builder /app/backend/dist ./backend/dist
+
+# Copy frontend built static files (backend serves these at runtime)
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 8080
 
+WORKDIR /app/backend
 CMD ["node", "dist/index.js"]
