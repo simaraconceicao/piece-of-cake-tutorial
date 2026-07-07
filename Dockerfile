@@ -1,5 +1,5 @@
 # --- Stage 1: Build Frontend ---
-FROM node:20-alpine AS frontend-builder
+FROM node:24-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
@@ -11,7 +11,7 @@ ENV VITE_API_URL=""
 RUN npm run build
 
 # --- Stage 2: Build Backend ---
-FROM node:20-alpine AS backend-builder
+FROM node:24-alpine AS backend-builder
 WORKDIR /app/backend
 
 COPY backend/package*.json ./
@@ -21,7 +21,7 @@ COPY backend/ ./
 RUN npm run build
 
 # --- Stage 3: Production Runner ---
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app/backend
 
 ENV NODE_ENV=production
