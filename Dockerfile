@@ -2,8 +2,8 @@
 FROM node:24-slim AS frontend-builder
 WORKDIR /app
 
-# Copy workspace root manifests + lockfile + workspace package.json files
-COPY package*.json ./
+# Copy workspace root manifests WITHOUT lockfile (fresh Linux install avoids cross-platform native binding issues)
+COPY package.json ./
 COPY frontend/package.json ./frontend/
 COPY backend/package.json ./backend/
 
