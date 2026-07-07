@@ -157,4 +157,4 @@ For personal/educational use, you'll realistically pay ~$0/month.
 | Frontend (React + Vite + polling) | ✅ Complete |
 | Docker + GitHub Actions pipeline | ✅ Complete |
 | GCP infrastructure setup (`setup.sh`) | ✅ Complete |
-| **First deployment to Cloud Run** | ⏳ Pending |
+| **First deployment to Cloud Run** | ⏳ Loading |
