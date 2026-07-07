@@ -69,7 +69,7 @@ jobs:
             GEMINI_API_KEY=GEMINI_API_KEY:latest
 
           # Run as the deployer SA so it has Firestore + GCS access at runtime
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          flags: --service-account=${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       # 6. Output Deployment URL
       - name: Show Deployment URL
