@@ -21,11 +21,15 @@ function getAiClient(): GoogleGenAI {
 /**
  * Dynamically suggests a real American English idiom
  */
-export async function suggestRandomIdiom(): Promise<string> {
+export async function suggestRandomIdiom(recentIdioms: string[] = []): Promise<string> {
   const modelName = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
   const client = getAiClient();
-  
-  const prompt = `Suggest a single, popular American English idiom (for example: "spill the beans", "bite the bullet", "cost an arm and a leg").
+
+  const avoidClause = recentIdioms.length > 0
+    ? `\nDo NOT suggest any of these recently used idioms: ${recentIdioms.map(i => `"${i}"`).join(', ')}.`
+    : '';
+
+  const prompt = `Suggest a single, popular American English idiom (for example: "spill the beans", "bite the bullet", "cost an arm and a leg").${avoidClause}
 Return ONLY the idiom name itself in lowercase, with no quotes, no period, and no explanation.`;
 
   try {

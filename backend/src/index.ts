@@ -22,6 +22,9 @@ interface TaskStatus {
 
 const activeTasks = new Map<string, TaskStatus>();
 
+// Small in-memory buffer to avoid back-to-back repetition (intentional repeats later show Firestore cache in action)
+const recentIdioms: string[] = [];
+
 /**
  * Worker that runs quiz and image generation concurrently in the background
  */
@@ -75,7 +78,9 @@ app.get('/health', (req, res) => {
 app.post('/api/shuffle', async (req, res) => {
   try {
     console.log('[Shuffle] Suggesting a new idiom...');
-    const idiom = await suggestRandomIdiom();
+    const idiom = await suggestRandomIdiom(recentIdioms);
+    recentIdioms.push(idiom);
+    if (recentIdioms.length > 5) recentIdioms.shift();
     const docId = normalizeIdiom(idiom);
     console.log(`[Shuffle] Suggested idiom: "${idiom}" (ID: ${docId})`);
 
