@@ -1,5 +1,5 @@
 # --- Stage 1: Build Frontend ---
-FROM node:24-alpine AS frontend-builder
+FROM node:24-slim AS frontend-builder
 WORKDIR /app
 
 # Copy workspace root manifests + lockfile + workspace package.json files
@@ -7,14 +7,14 @@ COPY package*.json ./
 COPY frontend/package.json ./frontend/
 COPY backend/package.json ./backend/
 
-RUN npm ci -w frontend
+RUN npm install -w frontend
 
 COPY frontend/ ./frontend/
 ENV VITE_API_URL=""
 RUN npm run build -w frontend
 
 # --- Stage 2: Build Backend ---
-FROM node:24-alpine AS backend-builder
+FROM node:24-slim AS backend-builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -27,7 +27,7 @@ COPY backend/ ./backend/
 RUN npm run build -w backend
 
 # --- Stage 3: Production Runner ---
-FROM node:24-alpine AS runner
+FROM node:24-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
